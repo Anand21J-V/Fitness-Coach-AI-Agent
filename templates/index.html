@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Fitness & Health Plan Generator</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)), 
+                        url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: #fff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 40px 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 3.5rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+            text-shadow: 0 0 30px rgba(255, 107, 107, 0.3);
+        }
+
+        .header .subtitle {
+            font-size: 1.2rem;
+            color: #ccc;
+            font-weight: 300;
+        }
+
+        /* Main Layout */
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        /* Form Section */
+        .form-section {
+            background: rgba(20, 20, 20, 0.9);
+            border-radius: 20px;
+            padding: 30px;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            height: fit-content;
+        }
+
+        .form-title {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: #ff6b6b;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #fff;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            color: #fff;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #ff6b6b;
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 0 20px rgba(255, 107, 107, 0.2);
+        }
+
+        .form-group input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .form-group select option {
+            background: #1a1a1a;
+            color: #fff;
+        }
+
+        /* Generate Button */
+        .generate-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(45deg, #ff6b6b, #ff8a80);
+            border: none;
+            border-radius: 15px;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(255, 107, 107, 0.4);
+        }
+
+        .generate-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        /* Results Section */
+        .results-section {
+            background: rgba(20, 20, 20, 0.9);
+            border-radius: 20px;
+            padding: 30px;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .results-title {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: #4ecdc4;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .placeholder {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .placeholder i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .results-content {
+            width: 100%;
+            max-height: 70vh;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        /* Headers Styling */
+        .results-content .title-header {
+            color: #ff6b6b;
+            font-size: 2rem;
+            margin: 30px 0 15px 0;
+            text-align: center;
+            background: linear-gradient(45deg, #ff6b6b, #ff8a80);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .results-content .main-header {
+            color: #4ecdc4;
+            font-size: 1.5rem;
+            margin: 25px 0 12px 0;
+            padding: 10px 15px;
+            background: rgba(78, 205, 196, 0.1);
+            border-left: 4px solid #4ecdc4;
+            border-radius: 0 10px 10px 0;
+        }
+
+        .results-content .section-header {
+            color: #ff8a80;
+            font-size: 1.2rem;
+            margin: 25px 0 15px 0;
+            padding: 12px 15px;
+            background: rgba(255, 138, 128, 0.1);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 138, 128, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .results-content .section-number {
+            background: linear-gradient(45deg, #ff6b6b, #ff8a80);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            min-width: 30px;
+            text-align: center;
+        }
+
+        .results-content h2, .results-content h3, .results-content h4 {
+            color: #ff6b6b;
+            margin: 20px 0 10px 0;
+        }
+
+        .results-content p {
+            line-height: 1.7;
+            margin-bottom: 15px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        /* Enhanced Table Styling */
+        .results-content .plan-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .results-content .plan-table th {
+            background: linear-gradient(45deg, rgba(255, 107, 107, 0.3), rgba(255, 138, 128, 0.3));
+            color: #ff6b6b;
+            font-weight: bold;
+            padding: 15px 12px;
+            text-align: left;
+            border-bottom: 2px solid rgba(255, 107, 107, 0.3);
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .results-content .plan-table td {
+            padding: 12px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            color: rgba(255, 255, 255, 0.9);
+            vertical-align: top;
+            line-height: 1.5;
+        }
+
+        .results-content .plan-table tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateX(2px);
+            transition: all 0.2s ease;
+        }
+
+        .results-content .plan-table tr:nth-child(even) {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .table-divider {
+            display: none;
+        }
+
+        /* Lists Styling */
+        .results-content .custom-list {
+            margin: 15px 0;
+            padding-left: 0;
+            list-style: none;
+        }
+
+        .results-content .bullet-item {
+            padding: 8px 15px;
+            margin: 8px 0;
+            background: rgba(255, 255, 255, 0.05);
+            border-left: 3px solid #4ecdc4;
+            border-radius: 0 8px 8px 0;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .results-content .bullet-item:hover {
+            background: rgba(78, 205, 196, 0.1);
+            transform: translateX(5px);
+        }
+
+        .results-content .bullet-item::before {
+            content: "▶";
+            color: #4ecdc4;
+            font-size: 0.8rem;
+            position: absolute;
+            left: -8px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(20, 20, 20, 0.9);
+            padding: 2px;
+            border-radius: 50%;
+        }
+
+        /* Strong and emphasis */
+        .results-content strong {
+            color: #ff6b6b;
+            font-weight: 600;
+        }
+
+        .results-content em {
+            color: #4ecdc4;
+            font-style: italic;
+        }
+
+        /* Special sections */
+        .results-content .summary-card {
+            background: rgba(255, 107, 107, 0.1);
+            border: 1px solid rgba(255, 107, 107, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .results-content .tip-box {
+            background: rgba(78, 205, 196, 0.1);
+            border: 1px solid rgba(78, 205, 196, 0.3);
+            border-radius: 12px;
+            padding: 15px;
+            margin: 15px 0;
+            position: relative;
+        }
+
+        .results-content .tip-box::before {
+            content: "💡";
+            position: absolute;
+            top: -10px;
+            left: 15px;
+            background: rgba(20, 20, 20, 0.9);
+            padding: 5px 8px;
+            border-radius: 50%;
+            font-size: 1.2rem;
+        }
+
+        /* Calculation boxes */
+        .results-content .calc-box {
+            background: rgba(69, 183, 209, 0.1);
+            border: 1px solid rgba(69, 183, 209, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+
+        /* Progress indicators */
+        .results-content .progress-section {
+            background: rgba(150, 206, 180, 0.1);
+            border: 1px solid rgba(150, 206, 180, 0.3);
+            border-radius: 12px;
+            padding: 18px;
+            margin: 20px 0;
+        }
+
+        /* Responsive table */
+        @media (max-width: 768px) {
+            .results-content .plan-table {
+                font-size: 0.85rem;
+            }
+            
+            .results-content .plan-table th,
+            .results-content .plan-table td {
+                padding: 8px 6px;
+            }
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: none;
+            text-align: center;
+        }
+
+        .loading i {
+            font-size: 3rem;
+            color: #ff6b6b;
+            animation: spin 2s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 40px 0;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-card i {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+
+        .stat-card.weight i { color: #ff6b6b; }
+        .stat-card.height i { color: #4ecdc4; }
+        .stat-card.activity i { color: #45b7d1; }
+        .stat-card.goal i { color: #96ceb4; }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.5rem;
+            }
+            
+            .container {
+                padding: 0 15px;
+            }
+            
+            .form-section,
+            .results-section {
+                padding: 20px;
+            }
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(45deg, #ff5252, #26c6da);
+        }
+    </style>
+</head>
+<body>
+    <div class="header animate__animated animate__fadeInDown">
+        <div class="container">
+            <h1><i class="fas fa-dumbbell"></i> AI FITNESS & HEALTH PLANNER</h1>
+            <p class="subtitle">Transform your body with personalized AI-powered fitness and nutrition plans</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="main-content">
+            <!-- Form Section -->
+            <div class="form-section animate__animated animate__fadeInLeft">
+                <h2 class="form-title">
+                    <i class="fas fa-user-cog"></i>
+                    Personal Details
+                </h2>
+                
+                <form id="fitnessForm">
+                    <div class="form-group">
+                        <label for="name"><i class="fas fa-user"></i> Name</label>
+                        <input type="text" id="name" name="name" placeholder="Enter your name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="age"><i class="fas fa-calendar"></i> Age (years)</label>
+                        <input type="number" id="age" name="age" min="10" max="100" value="25" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="weight"><i class="fas fa-weight"></i> Weight (kg)</label>
+                        <input type="number" id="weight" name="weight" min="30" max="200" value="70" step="0.1" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="height"><i class="fas fa-ruler-vertical"></i> Height (cm)</label>
+                        <input type="number" id="height" name="height" min="100" max="250" value="170" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="activity_level"><i class="fas fa-running"></i> Activity Level</label>
+                        <select id="activity_level" name="activity_level" required>
+                            <option value="">Select Activity Level</option>
+                            <option value="Low">Low - Sedentary lifestyle</option>
+                            <option value="Moderate">Moderate - Light exercise 1-3 days/week</option>
+                            <option value="High">High - Intense exercise 4-7 days/week</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="dietary_preference"><i class="fas fa-utensils"></i> Dietary Preference</label>
+                        <select id="dietary_preference" name="dietary_preference" required>
+                            <option value="">Select Diet Type</option>
+                            <option value="Keto">Keto - High fat, low carb</option>
+                            <option value="Vegetarian">Vegetarian - Plant-based</option>
+                            <option value="Low Carb">Low Carb - Reduced carbohydrates</option>
+                            <option value="Balanced">Balanced - All food groups</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="fitness_goal"><i class="fas fa-target"></i> Fitness Goal</label>
+                        <select id="fitness_goal" name="fitness_goal" required>
+                            <option value="">Select Your Goal</option>
+                            <option value="Weight Loss">Weight Loss - Burn fat</option>
+                            <option value="Muscle Gain">Muscle Gain - Build muscle</option>
+                            <option value="Endurance">Endurance - Improve stamina</option>
+                            <option value="Flexibility">Flexibility - Increase mobility</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="generate-btn">
+                        <i class="fas fa-magic"></i> Generate My Plan
+                    </button>
+                </form>
+            </div>
+
+            <!-- Results Section -->
+            <div class="results-section animate__animated animate__fadeInRight">
+                <div class="placeholder" id="placeholder">
+                    <i class="fas fa-chart-line"></i>
+                    <h3>Your Personalized Plan</h3>
+                    <p>Fill out the form and click "Generate My Plan" to receive your customized fitness and nutrition strategy.</p>
+                </div>
+
+                <div class="loading" id="loading">
+                    <i class="fas fa-dumbbell"></i>
+                    <h3>Generating Your Plan...</h3>
+                    <p>Our AI is creating your personalized fitness and nutrition strategy</p>
+                </div>
+
+                <div class="results-content" id="results" style="display: none;">
+                    <h2 class="results-title">
+                        <i class="fas fa-trophy"></i>
+                        Your Personalized Plan
+                    </h2>
+                    <div id="planContent"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="stats-grid" id="statsGrid" style="display: none;">
+            <div class="stat-card weight">
+                <i class="fas fa-weight-hanging"></i>
+                <h3 id="statWeight">--</h3>
+                <p>Weight (kg)</p>
+            </div>
+            <div class="stat-card height">
+                <i class="fas fa-ruler-vertical"></i>
+                <h3 id="statHeight">--</h3>
+                <p>Height (cm)</p>
+            </div>
+            <div class="stat-card activity">
+                <i class="fas fa-heartbeat"></i>
+                <h3 id="statActivity">--</h3>
+                <p>Activity Level</p>
+            </div>
+            <div class="stat-card goal">
+                <i class="fas fa-bullseye"></i>
+                <h3 id="statGoal">--</h3>
+                <p>Fitness Goal</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Form submission handler
+        document.getElementById('fitnessForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+            
+            // Show loading state
+            document.getElementById('placeholder').style.display = 'none';
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('results').style.display = 'none';
+            
+            // Update stats cards
+            updateStatsCards(data);
+            
+            try {
+                const response = await fetch('/generate_plan', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                // Hide loading state
+                document.getElementById('loading').style.display = 'none';
+                
+                if (result.success) {
+                    // Show results
+                    document.getElementById('results').style.display = 'block';
+                    document.getElementById('planContent').innerHTML = formatPlan(result.plan);
+                    document.getElementById('statsGrid').style.display = 'grid';
+                } else {
+                    // Show error
+                    document.getElementById('placeholder').style.display = 'block';
+                    document.getElementById('placeholder').innerHTML = `
+                        <i class="fas fa-exclamation-triangle" style="color: #ff6b6b;"></i>
+                        <h3>Error Generating Plan</h3>
+                        <p>${result.error || 'An error occurred while generating your plan. Please try again.'}</p>
+                    `;
+                }
+            } catch (error) {
+                // Hide loading state
+                document.getElementById('loading').style.display = 'none';
+                
+                // Show error
+                document.getElementById('placeholder').style.display = 'block';
+                document.getElementById('placeholder').innerHTML = `
+                    <i class="fas fa-wifi" style="color: #ff6b6b;"></i>
+                    <h3>Connection Error</h3>
+                    <p>Please check your internet connection and try again.</p>
+                `;
+            }
+        });
+
+        function updateStatsCards(data) {
+            document.getElementById('statWeight').textContent = data.weight;
+            document.getElementById('statHeight').textContent = data.height;
+            document.getElementById('statActivity').textContent = data.activity_level;
+            document.getElementById('statGoal').textContent = data.fitness_goal;
+        }
+
+        function formatPlan(planText) {
+            // Enhanced formatting with proper structure
+            let formattedText = planText
+                // Handle headers first
+                .replace(/### (I\.|II\.|III\.|IV\.|V\.|VI\.|VII\.)\s*(.*)/g, '<h3 class="section-header"><span class="section-number">$1</span> $2</h3>')
+                .replace(/### (.*)/g, '<h3 class="section-header">$1</h3>')
+                .replace(/## (.*)/g, '<h2 class="main-header">$2</h2>')
+                .replace(/# (.*)/g, '<h1 class="title-header">$1</h1>')
+                
+                // Handle calculations and formulas
+                .replace(/(BMR = .*|TDEE = .*|.*= .*calories)/g, '<div class="calc-box">$1</div>')
+                
+                // Handle bold and italic
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                
+                // Convert markdown tables to HTML tables
+                .replace(/\|(.+)\|\n\|[-\s|:]+\|\n((?:\|.+\|\n?)*)/g, function(match, header, rows) {
+                    let tableHTML = '<table class="plan-table">';
+                    
+                    // Process header
+                    const headerCells = header.split('|').map(cell => cell.trim()).filter(cell => cell);
+                    tableHTML += '<tr>' + headerCells.map(cell => `<th>${cell}</th>`).join('') + '</tr>';
+                    
+                    // Process rows
+                    const rowLines = rows.trim().split('\n');
+                    rowLines.forEach(row => {
+                        const cells = row.split('|').map(cell => cell.trim()).filter(cell => cell);
+                        if (cells.length > 0) {
+                            tableHTML += '<tr>' + cells.map(cell => `<td>${cell}</td>`).join('') + '</tr>';
+                        }
+                    });
+                    
+                    tableHTML += '</table>';
+                    return tableHTML;
+                })
+                
+                // Handle lists
+                .replace(/^\* (.*)$/gm, '<li class="bullet-item">$1</li>')
+                
+                // Handle line breaks and paragraphs
+                .split('\n\n').map(paragraph => {
+                    if (paragraph.includes('<li class="bullet-item">')) {
+                        return '<ul class="custom-list">' + paragraph + '</ul>';
+                    } else if (paragraph.includes('<table') || paragraph.includes('<h1') || paragraph.includes('<h2') || paragraph.includes('<h3') || paragraph.includes('<div class="calc-box">')) {
+                        return paragraph;
+                    } else {
+                        return '<p>' + paragraph.replace(/\n/g, '<br>') + '</p>';
+                    }
+                }).join('');
+            
+            return formattedText;
+        }
+
+        // Add smooth animations on scroll
+        window.addEventListener('scroll', function() {
+            const elements = document.querySelectorAll('.stat-card');
+            elements.forEach(element => {
+                const elementTop = element.getBoundingClientRect().top;
+                const elementVisible = 150;
+                
+                if (elementTop < window.innerHeight - elementVisible) {
+                    element.classList.add('animate__animated', 'animate__fadeInUp');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
